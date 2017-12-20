@@ -35,5 +35,5 @@ variable "VMAdminName" {
 variable "VMAdminPassword" {
 
     type    = "string"
-    default = "Devoteam75!"
+    default = "Alstomgroup75!"
 }
