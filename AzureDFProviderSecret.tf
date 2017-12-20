@@ -1,6 +1,25 @@
 #################################################################
 # Variables for Azure Registration
 #################################################################
+ variable "AzureSubscriptionID" {
+  type    = "string"
+  default = "XXXXXX"
+}
+
+variable "AzureClientID" {
+  type    = "string"
+  default = "XXXXX"
+}
+
+variable "AzureClientSecret" {
+  type    = "string"
+  default = "XXXXX"
+}
+
+variable "AzureTenantID" {
+  type    = "string"
+  default = "XXXX"
+}
 
 
 # Variable defining VM Admin Name

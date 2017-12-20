@@ -89,6 +89,23 @@ resource "azurerm_managed_disk" "TerraManagedDisk" {
     
 }
 
+resource "azurerm_managed_disk" "TerraManagedDisk2" {
+
+
+    count                   = "${var.Manageddiskcount}"
+    name                    = "${var.ManageddiskName}"
+    location                = "${var.ManagedDiskLocation}"
+    resource_group_name     = "${var.RGName}"
+    storage_account_type    = "${var.StorageAccountType}"
+    create_option           = "${var.CreateOption}"
+    disk_size_gb            = "${var.DiskSizeInGB}"
+
+    tags {
+    environment = "${var.EnvironmentTag}"
+    usage       = "${var.EnvironmentUsageTag}"
+  }
+    
+}
 
 #Output
 
@@ -105,4 +122,15 @@ output "Id" {
 output "Size" {
 
   value = "${azurerm_managed_disk.TerraManagedDisk.disk_size_gb}"
+}
+
+
+output "Name2" {
+
+  value = "${azurerm_managed_disk.TerraManagedDisk2.name}"
+}
+
+output "Id2" {
+
+  value = "${azurerm_managed_disk.TerraManagedDisk2.id}"
 }

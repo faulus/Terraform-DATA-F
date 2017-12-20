@@ -83,6 +83,19 @@ variable "DataDiskName" {
   
 }
 
+variable "DataDiskId2" {
+  type    = "string"
+
+  
+}
+
+# Managed Data Disk Name
+
+variable "DataDiskName2" {
+  type    = "string"
+
+  
+}
 # Managed Data Disk size
 
 variable "DataDiskSize" {
@@ -136,12 +149,18 @@ variable "PublicIPId" {
 
 }
 
+variable "NSGId" {
+  type    = "string"
+
+}
+
 resource "azurerm_network_interface" "TerraNIC" {
 
  
     name                    = "${var.NICName}"
     location                = "${var.VMLocation}"
     resource_group_name     = "${var.VMRG}"
+    network_security_group_id  = "${var.NSGId}"
       
 
     ip_configuration {
@@ -199,6 +218,17 @@ resource "azurerm_virtual_machine" "TerraVM" {
         managed_disk_id     = "${var.DataDiskId}"
         create_option       = "Attach"
         lun                 = 0
+        disk_size_gb        = "${var.DataDiskSize}"
+        
+
+    }
+
+     storage_data_disk {
+
+        name                = "${var.DataDiskName2}"
+        managed_disk_id     = "${var.DataDiskId2}"
+        create_option       = "Attach"
+        lun                 = 1
         disk_size_gb        = "${var.DataDiskSize}"
         
 

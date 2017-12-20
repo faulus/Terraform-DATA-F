@@ -12,13 +12,13 @@ module "Datadisk-VM-sm-iotdf" {
     source = "./Modules/ManagedDisk/"    
     
     #Module variable
-    Manageddiskcount    = "2"
+    Manageddiskcount    = "1"
     ManageddiskName     = "DataDisk_iotdf"
     RGName              = "${module.ResourceGroup.Name}"
     ManagedDiskLocation = "${var.AzureRegion}"
-    StorageAccountType  = "${lookup(var.Manageddiskstoragetier, 0)}"
+    StorageAccountType  = "${lookup(var.Manageddiskstoragetier, 1)}"
     CreateOption        = "Empty"
-    DiskSizeInGB        = "1024"
+    DiskSizeInGB        = "62"
     EnvironmentTag      = "${var.EnvironmentTag}"
     EnvironmentUsageTag = "${var.EnvironmentUsageTag}"
 
@@ -26,23 +26,24 @@ module "Datadisk-VM-sm-iotdf" {
 
 
 #Datadisk 2 creation
-#module "Datadisk2-VM-sm-iotdf" {
+module "Datadisk2-VM-sm-iotdf" {
 
 #
     #Module Location
- #   source = "./Modules/ManagedDisk/"    
+   source = "./Modules/ManagedDisk/"    
     
     ####Module variable
-   #### ManageddiskName         = "VM-sm-iotdf-Datadisk2"
-  #####  RGName                  = "${module.ResourceGroup.Name}"
-    ###ManagedDiskLocation     = "${var.AzureRegion}"
-    ###StorageAccountType      = "${lookup(var.Manageddiskstoragetier, 0)}"
-    ###CreateOption            = "empty"
-    ###DiskSizeInGB            = "62"
-    ###EnvironmentTag          = "${var.EnvironmentTag}"
-    ###EnvironmentUsageTag     = "${var.EnvironmentUsageTag}"
-##}
-#
+    Manageddiskcount    = "1"
+    ManageddiskName         = "VM-sm-iotdf-Datadisk2"
+    RGName                  = "${module.ResourceGroup.Name}"
+    ManagedDiskLocation     = "${var.AzureRegion}"
+    StorageAccountType      = "${lookup(var.Manageddiskstoragetier, 1)}"
+    CreateOption            = "empty"
+    DiskSizeInGB            = "62"
+    EnvironmentTag          = "${var.EnvironmentTag}"
+    EnvironmentUsageTag     = "${var.EnvironmentUsageTag}"
+}
+
 module "VM-sm-iotdf-AS" {
 
     #module location
@@ -71,25 +72,41 @@ module "PublicIP" {
     EnvironmentUsageTag     = "Lab only"
 }
 
-module "NSG" {
+
+resource "azurerm_network_security_group" "Terra-NSG2" {
+
+    name                = "test"
+    location            = "${module.ResourceGroup.Location}"
+    resource_group_name = "${module.ResourceGroup.Name}"
+
+
+    tags {
+        environment = "${var.EnvironmentTag}"
+        usage       = "${var.EnvironmentUsageTag}"
+    }  
+}
+
+
+module "NSGRule" {
 
     #Module location
     source = "./Modules/NSG"
 
     #Module variable
-    NSGName                 = "NSG"
     RGName                  = "${module.ResourceGroup.Name}"
+    NSGRuleName                 = "NSG"
     NSGLocation             = "${module.ResourceGroup.Location}"
     EnvironmentTag          = "Lab-Moduletest"
     EnvironmentUsageTag     = "Lab only"
+    NSGRulePriority         = "101"
+    NSGRuleDirection        = "Inbound"
+    NSGRuleAccess           = "Allow"
     NSGRuleProtocol         = "TCP"
     NSGRuleSourcePortRange  = "*"
     NSGRuleDestinationPortRange = "443"
-    NSGRuleSourceAddressPrefix = "*"
+    NSGRuleSourceAddressPrefix = "Internet"
     NSGRuleDestinationAddressPrefix = "*"
-    NSGReference            = ""
-    NSGRulePriority         = "101"
-    NSGRuleDirection        = "Inbound"
+    NSGReference            = "test"
 
 }
 module "Subnet" {
@@ -102,7 +119,7 @@ module "Subnet" {
     RGName                      = "${module.ResourceGroup.Name}"
     vNetName                    = "${module.vNet.Name}"
     Subnetaddressprefix         = "10.0.0.0/24"
-    NSGid                       = "${module.NSG.Id}"
+    NSGid                       = "${azurerm_network_security_group.Terra-NSG2.id}"
     EnvironmentTag              = "Lab-Moduletest"
     EnvironmentUsageTag         = "Lab only"
 
@@ -130,7 +147,11 @@ module "VM-sm-iotdf" {
     DataDiskName        = "${module.Datadisk-VM-sm-iotdf.Name}"
     DataDiskId          = "${module.Datadisk-VM-sm-iotdf.Id}"
     DataDiskSize        = "${module.Datadisk-VM-sm-iotdf.Size}"
+    DataDiskName2        = "${module.Datadisk2-VM-sm-iotdf.Name2}"
+    DataDiskId2          = "${module.Datadisk2-VM-sm-iotdf.Id2}"
+    DataDiskSize        = "${module.Datadisk2-VM-sm-iotdf.Size}"
     PublicIPId          = "${module.PublicIP.Id}"
    SubnetId           = "${module.Subnet.Id}"
+   NSGId                = "${azurerm_network_security_group.Terra-NSG2.id}"
 
 }
